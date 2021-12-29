@@ -15,13 +15,10 @@
       root.innerHTML = "<p>Let's build a WebSocket!</p>";
 
       let ws = new WebSocket("ws://localhost:8080");
-
-      // ws.addEventListener("open", () => {
-      //   ws.send("Hello, Server!");
-      // });
+      console.log(ws);
 
       ws.addEventListener("message", (ev) => {
-        console.log(`Message from server: ${ev.data}`)
+        console.log(`Server: ${ev.data}`);
       });
 
       // ws.close("Bye Server!");

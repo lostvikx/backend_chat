@@ -9,14 +9,11 @@ let connection = null;
 // raw http server, this will help us create a TCP for websocket
 const httpServer = http.createServer((req, res) => {
   console.log(`Request for ${req.url}`);
-  // res.writeHead(200, {
-    // "Connection": "keep-alive",
-    // "Access-Control-Allow-Origin": "*",
-    // "Content-Security-Policy": "connect-src" ["self", "ws://localhost:8080"]
-  // });
+
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Content-Type", "text/html");
-  res.setHeader("X-Content-Type-Options", "nosniff");
+  // res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("Content-Security-Policy", "connect-src 'self'");
   
   let path = `${__dirname}/views/`;
 
@@ -52,22 +49,25 @@ const webSocket = new WebSocketServer({
 webSocket.on("request", req => {
   // we create a connection, as we have not defined a sub-protocol: null is the default to accept the request
   connection = req.accept(null, req.origin);
+  
   console.log("Connection Accepted!");
 
-  // listening for open, send a message
-  connection.on("open", () => {
-    console.log("Connection Opened!");
-    connection.send("Hello there, client! This is a test message.");
+  // listening for a message, then sending a reply
+  connection.on("message", message => {
+    console.log(`Client: ${message.utf8Data}`);
+    connection.send(`Got your message.`);
   });
 
   // event listeners, makes it stateful
   connection.on("error", () => console.error("Connection Error!"));
-  
+
   connection.on("close", () => console.log("Connection Closed!"));
 
-  // listening for a message, then sending a reply
-  connection.on("message", message => {
-    console.log(`Received Message: ${message.utf8Data}`);
-    connection.send(`Got your message.`);
-  });
+  // keepSending();
+
 });
+
+function keepSending() {
+  connection.send(`${Math.round(Math.random() * 100)}`);
+  setTimeout(keepSending, 5000);
+}
