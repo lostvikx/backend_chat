@@ -25,6 +25,10 @@ const httpServer = http.createServer((req, res) => {
       path += "index.html";
       res.statusCode = 200;
       break;
+
+    default:
+      path += "404.html";
+      res.statusCode = 404;
   }
 
   readFile(path, (err, data) => {
@@ -50,10 +54,10 @@ webSocket.on("request", req => {
   connection = req.accept(null, req.origin);
   console.log("Connection Accepted!");
 
-  // listening for open, sending a message
+  // listening for open, send a message
   connection.on("open", () => {
     console.log("Connection Opened!");
-    // connection.send("Hello there, client! This is a test message.")
+    connection.send("Hello there, client! This is a test message.");
   });
 
   // event listeners, makes it stateful
@@ -63,8 +67,7 @@ webSocket.on("request", req => {
 
   // listening for a message, then sending a reply
   connection.on("message", message => {
-    // console.log("Received Message");
-    connection.send(`Got your message: ${message.utf8Data}`);
+    console.log(`Received Message: ${message.utf8Data}`);
+    connection.send(`Got your message.`);
   });
 });
-
