@@ -3,18 +3,38 @@
 
 const http = require("http");
 const WebSocketServer = require("websocket").server;
+const { readFile } = require("fs")
 let connection = null;
 
 // raw http server, this will help us create a TCP for websocket
 const httpServer = http.createServer((req, res) => {
   console.log(`Request for ${req.url}`);
-  res.writeHead(200, {
-    "Connection": "keep-alive",
-    // "Content-type": "text/html",
-    "Access-Control-Allow-Origin": "*"
+  // res.writeHead(200, {
+    // "Connection": "keep-alive",
+    // "Access-Control-Allow-Origin": "*",
+    // "Content-Security-Policy": "connect-src" ["self", "ws://localhost:8080"]
+  // });
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Content-Type", "text/html");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  
+  let path = `${__dirname}/views/`;
+
+  switch (req.url) {
+    case "/":
+      path += "index.html";
+      res.statusCode = 200;
+      break;
+  }
+
+  readFile(path, (err, data) => {
+    if (err) {
+      console.error(err);
+      res.end();
+    } else {
+      res.end(data);
+    }
   });
-  res.writeHead(404);
-  res.end();
 });
 
 httpServer.listen(8080, () => console.log("Server listening on http://localhost:8080"));
@@ -22,7 +42,7 @@ httpServer.listen(8080, () => console.log("Server listening on http://localhost:
 // TCP webSocket
 const webSocket = new WebSocketServer({
   "httpServer": httpServer,
-  "autoAcceptConnections": false
+  "autoAcceptConnections": false,
 });
 
 webSocket.on("request", req => {

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSockets</title>
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+    "use strict";
+      const root = document.getElementById("root");
+
+      root.innerHTML = "<p>Let's build a WebSocket!</p>";
+
+      let ws = new WebSocket("ws://localhost:8080");
+
+      console.log(ws);
+
+      // ws.addEventListener("open", () => {
+      //   ws.send("Hello, Server!");
+      // });
+
+      // ws.addEventListener("message", (ev) => {
+      //   console.log(`Message from server: ${ev.data}`)
+      // });
+
+      // ws.close("Bye Server!");
+  </script>
+  <noscript>Please enable JavaScript!</noscript>
+</body>
+</html>
