@@ -38,7 +38,14 @@ const httpServer = http.createServer((req, res) => {
   });
 });
 
-httpServer.listen(8080, () => console.log("Server listening on http://localhost:8080"));
+httpServer.on("listening", () => console.log(`Listening on ${httpServer.address().port} at ${httpServer.address().address} ${httpServer.address().family}`));
+
+// If we don't specify the ip address then http server listens on the public ip address.
+// httpServer.listen(8080, "::1"); // IPv6 "::1" === "localhost"
+
+httpServer.listen(8080, "localhost");
+
+httpServer.on("error", (err) => console.error(err));
 
 // TCP webSocket
 const webSocket = new WebSocketServer({
@@ -68,6 +75,6 @@ webSocket.on("request", req => {
 });
 
 function keepSending() {
-  connection.send(`${Math.round(Math.random() * 100)}`);
+  connection.send(`Magic Number: ${Math.round(Math.random() * 100)}`);
   setTimeout(keepSending, 5000);
 }
