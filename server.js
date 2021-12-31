@@ -57,7 +57,7 @@ webSocket.on("request", req => {
   // we create a connection, as we have not defined a sub-protocol: null is the default to accept the request
   connection = req.accept(null, req.origin);
   
-  // console.log("Connection Accepted!");
+  console.log("Connection Open!");
 
   // listening for a message, then sending a reply
   connection.on("message", message => {
@@ -68,7 +68,7 @@ webSocket.on("request", req => {
   // event listeners, makes it stateful
   connection.on("error", () => console.error("Connection Error!"));
 
-  connection.on("close", (reason) => console.log("Connection Closed!"));
+  connection.on("close", () => console.log("Connection Closed!"));
 
   // keepSending();
 
