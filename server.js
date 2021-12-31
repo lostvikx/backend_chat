@@ -8,7 +8,7 @@ let connection = null;
 
 // raw http server, this will help us create a TCP for websocket
 const httpServer = http.createServer((req, res) => {
-  console.log(`Request for ${req.url}`);
+  // console.log(`Request for ${req.url}`);
 
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Content-Type", "text/html");
@@ -57,7 +57,7 @@ webSocket.on("request", req => {
   // we create a connection, as we have not defined a sub-protocol: null is the default to accept the request
   connection = req.accept(null, req.origin);
   
-  console.log("Connection Accepted!");
+  // console.log("Connection Accepted!");
 
   // listening for a message, then sending a reply
   connection.on("message", message => {
@@ -68,7 +68,7 @@ webSocket.on("request", req => {
   // event listeners, makes it stateful
   connection.on("error", () => console.error("Connection Error!"));
 
-  connection.on("close", () => console.log("Connection Closed!"));
+  connection.on("close", (reason) => console.log("Connection Closed!"));
 
   // keepSending();
 

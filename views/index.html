@@ -30,6 +30,7 @@
       min-width: 500px;
       max-height: 500px;
       background-color: coral;
+      overflow-y: auto;
     }
     .flex {
       display: flex;
@@ -60,12 +61,15 @@
       margin: 1rem 0;
       padding: 0.25em;
     }
+    #closeSocket {
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1 class="title-text">Let's build a WebSocket Connection! &#128520</h1>
+      <h1 class="title-text">Let's build a WebSocket Connection! <span id="closeSocket" title="Close WebSocket Connection">&#128520</span></h1>
     </header>
     <main class="flex">
       <div id="messages" class="messages"></div>
@@ -81,22 +85,35 @@
     "use strict";
       // const root = document.getElementById("root");
       const message = document.getElementById("message");
+      const messageBox = document.getElementById("messages");
       const form = document.getElementById("form");
       const ws = new WebSocket("ws://localhost:8080");
       console.log(ws);
+      const names = ["Client: ", "Server: "];
+      const closeSocket = document.getElementById("closeSocket");
 
       form.addEventListener("submit", (event) => {
         event.preventDefault();
-
-      })
-
+        ws.send(String(message.value));
+        let text = document.createElement("p");
+        text.innerText = names[0] + String(message.value);
+        messageBox.insertAdjacentElement("beforeend", text);
+        messageBox.scrollTop = messageBox.scrollHeight;
+        message.value = "";
+      });
       
-
-      ws.addEventListener("message", (ev) => {
-        console.log(`Server: ${ev.data}`);
+      ws.addEventListener("message", (event) => {
+        // console.log(`Server: ${event.data}`);
+        let text = document.createElement("p");
+        text.innerText = names[1] + String(event.data);
+        messageBox.insertAdjacentElement("beforeend", text);
+        messageBox.scrollTop = messageBox.scrollHeight;
       });
 
-      // ws.close("Bye Server!");
+      closeSocket.addEventListener("click", (e) => {
+        e.preventDefault();
+        ws.close(1000, "Good Bye Server!");
+      });
   </script>
   <noscript>Please enable JavaScript!</noscript>
 </body>
