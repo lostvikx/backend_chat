@@ -3,7 +3,7 @@
 
 const http = require("http");
 const WebSocketServer = require("websocket").server;
-const { readFile } = require("fs");
+const { readFile, createReadStream } = require("fs");
 const path = require("path");
 let connection = null;
 
@@ -16,7 +16,7 @@ const httpServer = http.createServer((req, res) => {
   // res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("Content-Security-Policy", "connect-src 'self'");
   
-  let filePath = `${__dirname}/views/`;
+  let filePath = `${__dirname}/views`;
 
   const mimeTypes = {
     '.ico': 'image/x-icon',
@@ -40,24 +40,41 @@ const httpServer = http.createServer((req, res) => {
 
   Object.freeze(mimeTypes);
 
+  // Change to switch statements for routing pages.
   if (req.url == "/") {
-    filePath += "index.html";
+    filePath += "/index.html";
   } else {
-    filePath += String(req.url).slice(1);
+    filePath += String(req.url);
   }
 
   const extName = String(path.extname(filePath)).toLowerCase();
 
-  readFile(filePath, (err, data) => {
-    if (err) {
-      console.error(err);
-      res.writeHead(404);
-      res.end(JSON.stringify(err));
+  // console.log(`path: ${filePath}, ext: ${extName}`);
+
+  const readStream = createReadStream(filePath);
+
+  readStream.on("error", (err) => {
+    // console.error(err);
+    res.statusCode = 404;
+    if (extName === "") {
+      readFile(`${__dirname}/views/404.html`, (err, data) => {
+        if (err) {
+          console.error(err);
+        } else {
+          res.setHeader("Content-Type", "text/html");
+          res.end(data);
+        }
+      });
     } else {
-      res.statusCode = 200;
-      res.setHeader("Content-Type", mimeTypes[extName]);
-      res.end(data);
+      console.error(err);
+      res.end();
     }
+  });
+
+  readStream.on("open", () => {
+    res.statusCode = 200;
+    res.setHeader("Content-Type", mimeTypes[extName]);
+    readStream.pipe(res);
   });
 });
 
