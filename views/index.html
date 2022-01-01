@@ -4,72 +4,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WebSockets</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    .container {
-      max-width: 900px;
-      margin: 1rem auto;
-      background-color: brown;
-    }
-    .title-text {
-      font-size: 1.5rem;
-      font-weight: 400;
-    }
-    header {
-      /* margin: 1rem; */
-      text-align: center;
-      padding: 1rem;
-    }
-    .messages {
-      min-height: 500px;
-      min-width: 500px;
-      max-height: 500px;
-      background-color: coral;
-      overflow-y: auto;
-    }
-    .flex {
-      display: flex;
-      align-items: center;
-      flex-direction: column;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1rem;
-    }
-    .submit-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 0.5em;
-      font-size: 1rem;
-    }
-    form {
-      width: 500px;
-      display: flex;
-      flex-flow: row nowrap;
-      justify-content: center;
-      align-items: center;
-      gap: 1rem;
-      /* border: 1px black solid; */
-      margin-bottom: 1rem;
-    }
-    .text-box {
-      flex-grow: 0.9;
-      font-size: 1rem;
-      margin: 1rem 0;
-      padding: 0.4em 0.6em;
-      outline: none;
-      border: 1px solid black;
-      border-radius: 10px;
-    }
-    #closeSocket {
-      cursor: pointer;
-    }
-  </style>
+  <link rel="stylesheet" href="./styles.css">
+  <title>Messages | WebSocket App</title>
 </head>
 <body>
   <div class="container">
@@ -86,63 +22,7 @@
       </form>
     </main>
   </div>
-  <script>
-    "use strict";
-      // const root = document.getElementById("root");
-      const message = document.getElementById("message");  // input
-      const messageBox = document.getElementById("messages");  // messageBox div
-      const form = document.getElementById("form");
-
-      const ws = new WebSocket("ws://localhost:8080");
-      console.log(ws);
-
-      // Names {subject to change!}
-      const names = ["Client: ", "Server: "];
-
-      // Btn to close the socket connection
-      const closeSocket = document.getElementById("closeSocket");
-
-      // Sending message event
-      form.addEventListener("submit", (event) => {
-        event.preventDefault();
-
-        // I think this is asynchronous
-        ws.send(String(message.value));
-
-        // Create message bubble
-        let text = document.createElement("p");
-        text.innerText = names[0] + String(message.value);
-        text.classList.add("text");
-        messageBox.insertAdjacentElement("beforeend", text);
-
-        // this ensures that we are always scrolled to the bottom
-        messageBox.scrollTop = messageBox.scrollHeight;
-
-        message.value = "";  // this might go wrong
-      });
-      
-      // Receiving message event
-      ws.addEventListener("message", (event) => {
-        // console.log(`Server: ${event.data}`);
-
-        // Create message bubble
-        let text = document.createElement("p");
-        text.innerText = names[1] + String(event.data);
-        text.classList.add("text");
-        messageBox.insertAdjacentElement("beforeend", text);
-
-        // more scroll
-        messageBox.scrollTop = messageBox.scrollHeight;
-      });
-
-      // closeSocket Btn click
-      closeSocket.addEventListener("click", (e) => {
-        e.preventDefault();
-        // closing the WebSocket connection
-        ws.close(1000, "Good Bye Server!");
-      });
-
-  </script>
+  <script src="./client.js" defer></script>
   <noscript>Please enable JavaScript!</noscript>
 </body>
 </html>

@@ -3,36 +3,59 @@
 
 const http = require("http");
 const WebSocketServer = require("websocket").server;
-const { readFile } = require("fs")
+const { readFile } = require("fs");
+const path = require("path");
 let connection = null;
 
 // raw http server, this will help us create a TCP for websocket
 const httpServer = http.createServer((req, res) => {
   // console.log(`Request for ${req.url}`);
 
+  // Allows all requests {GET, POST, PUT, DELETE}
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Content-Type", "text/html");
   // res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("Content-Security-Policy", "connect-src 'self'");
   
-  let path = `${__dirname}/views/`;
+  let filePath = `${__dirname}/views/`;
 
-  switch (req.url) {
-    case "/":
-      path += "index.html";
-      res.statusCode = 200;
-      break;
+  const mimeTypes = {
+    '.ico': 'image/x-icon',
+    '.html': 'text/html',
+    '.js': 'text/javascript',
+    '.css': 'text/css',
+    '.json': 'application/json',
+    '.png': 'image/png',
+    '.jpg': 'image/jpg',
+    '.gif': 'image/gif',
+    '.svg': 'image/svg+xml',
+    '.wav': 'audio/wav',
+    '.mp3': 'audio/mpeg',
+    '.mp4': 'video/mp4',
+    '.woff': 'application/font-woff',
+    '.ttf': 'application/font-ttf',
+    '.eot': 'application/vnd.ms-fontobject',
+    '.otf': 'application/font-otf',
+    '.wasm': 'application/wasm'
+  };
 
-    default:
-      path += "404.html";
-      res.statusCode = 404;
+  Object.freeze(mimeTypes);
+
+  if (req.url == "/") {
+    filePath += "index.html";
+  } else {
+    filePath += String(req.url).slice(1);
   }
 
-  readFile(path, (err, data) => {
+  const extName = String(path.extname(filePath)).toLowerCase();
+
+  readFile(filePath, (err, data) => {
     if (err) {
       console.error(err);
-      res.end();
+      res.writeHead(404);
+      res.end(JSON.stringify(err));
     } else {
+      res.statusCode = 200;
+      res.setHeader("Content-Type", mimeTypes[extName]);
       res.end(data);
     }
   });
